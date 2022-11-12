@@ -14,10 +14,11 @@ But each philosorpher need "two" spoon to eat a meal while there are only 5 spoo
 4) Philosorpher 5 can't eat within 100 second, so he died from starvation.
 
 # What to understand
-Philosorpher is an (hard) introduction to parallel processing in computer which is required for large programming structure.
-Normally, program executed from start (first row of int main) to last row (return 0) But if I make program to execute 100 functions
-that shared and altered any value, the program will be slow to process it must execute function 1 to 100. But if you use thread,
-you can seperate 100 functions to 5 parallel process of 20 functions.
+The issue is the the program must compute 5 philosorpher independently at the same time, which require parallel computing.
+There are several method to enable parallel computing, but I start by using thread.
+
+Thread is a parallel chain of funtion that program created to compute several functions at the same time. They share value
+of parameters and address together.
 
 # Note
 This code IS NOT written per 42 norminette and use several PROHIBITED FUNCTION.
