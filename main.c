@@ -27,19 +27,11 @@ int main(int argc, char **argv)
     obs = get_obs(argc, argv);
     /*make (no_of_philo) philos*/
     philos = malloc(sizeof(t_philo_param) * obs.no_of_philo);
-    for (int i = 0; i < obs.no_of_philo; i++) {
-        philo_init(&philos[i] ,obs ,i);
-        /*if the philo can't init fork, free all philos and exit*/
-        if (philos[i].fork_stat != 0) {
-            while (i > 0)
-                free(philos[i--]);
-            return (1);
-        }
-    }
+    philo_init(&philos ,obs);
     /*make (no_of_philo) philosorpher*/
     th = malloc(sizeof(pthread_t) * obs.no_of_philo);
     for (int i = 0; i < obs.no_of_philo; i++) {
-        if (pthread_create(&th[i], NULL, &philo, (void *)philos) != 0) {
+        if (pthread_create(&th[i], NULL, &philo, (void *)&philos[i]) != 0) {
             printf("Failed to create thread philo[%d] \n", i + 1);
         }
     }

@@ -27,14 +27,15 @@ typedef struct s_observer {
 
 typedef struct s_philo_param
 {
-    t_observer  *ref;   //to pass argvs to philo
-    int     last_eat;   //to store last time it eat
-    pthread_mutex_t     fork;   //each philo have a fork
-    int     fork_stat;  //status of the fork
-    int     philo_num;  //name of the philo
+    t_observer              *ref;   //to pass argvs to philo
+    int                     last_eat;   //to store last time it eat
+    pthread_mutex_t         fork;   //each philo have a fork
+    int                     fork_stat;  //status of the fork
+    int                     philo_name;  //name of the philo
+    struct s_philo_param    *next; //pointer to n+1 philo
 }   t_philo_param;
 
-void*   philo(void *philos);
-void   philo_init(t_philo_param *philo, t_observer obs, int i);
+void*   philo(t_philo_param *philo);
+void   philo_init(t_philo_param *philo, t_observer obs);
 void    philo_destroy(t_philo_param *philos);
 #endif
