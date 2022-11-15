@@ -17,26 +17,29 @@ t_observer  get_obs(int argc, char **argv)
 int main(int argc, char **argv)
 {
     t_observer  obs;
+    t_philo_param   *philos;
     pthread_t  *th;
-    pthread_mutex_t *forks;
 
     if (argc < 5 || argc > 6) {
         printf("You must type 4 or 5 arguments (exclude ./philo) \n");
         return (1);
     }
     obs = get_obs(argc, argv);
-    /*make (no_of_philo) forks*/
-    forks = malloc(sizeof(pthread_mutex_t) * obs.no_of_philo);
+    /*make (no_of_philo) philos*/
+    philos = malloc(sizeof(t_philo_param) * obs.no_of_philo);
     for (int i = 0; i < obs.no_of_philo; i++) {
-        if (pthread_mutex_init(&forks[i], NULL) != 0) {
-            printf("Failed to initialize fork[%d]\n", i);
+        philo_init(&philos[i] ,obs ,i);
+        /*if the philo can't init fork, free all philos and exit*/
+        if (philos[i].fork_stat != 0) {
+            while (i > 0)
+                free(philos[i--]);
+            return (1);
         }
     }
     /*make (no_of_philo) philosorpher*/
     th = malloc(sizeof(pthread_t) * obs.no_of_philo);
-    for (int i = 0; i < obs.no_of_philo; i++)
     for (int i = 0; i < obs.no_of_philo; i++) {
-        if (pthread_create(&th[i], NULL, &philo, NULL) != 0) {
+        if (pthread_create(&th[i], NULL, &philo, (void *)philos) != 0) {
             printf("Failed to create thread philo[%d] \n", i + 1);
         }
     }
@@ -46,11 +49,8 @@ int main(int argc, char **argv)
             printf("Failed to join thread philo[%d] \n", i + 1);
         }
     }
+    if (obs.died == 1)
     /*destroy all mutex to clean the program*/
-    for (int i = 0; i < obs.no_of_philo; i++) {
-        if (pthread_mutex_destroy(&forks) != 0) {
-            printf("Fork[%d] destroyed\n", i);
-        }
-    }
+        philo_destroy(philos);
     return (0);
 }
