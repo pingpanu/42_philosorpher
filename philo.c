@@ -1,52 +1,110 @@
 #include "philo.h"
 
-void   philo_init(t_philo_param *philo, t_observer obs)
+void   philo_init(t_env *prog)
 {
-    struct timeval  cur_time;
+    /*init forks*/
+    prog->forks = malloc(sizeof(pthread_mutex_t) * prog->inputs.no_of_philo);
+    for (int i = 0; i < prog->inputs.no_of_philo; i++)
+        pthread_mutex_init(&prog->forks[i], NULL);
+    for (int i = 0; i < prog->inputs.no_of_philo; i++)
+    {
+        prog->philos[i].philo_id = i + 1;
+        prog->philos[i].last_eat = get_ms();
+        prog->philos[i].no_of_ate = 0;
+        prog->philos[i].left_fork_index = i;
+        if (i == prog->inputs.no_of_philo - 1)
+            prog->philos[i].right_fork_index = 0;
+        else
+            prog->philos[i].right_fork_index = i + 1;
+    }
+}
 
-    gettimeofday(&cur_time, NULL);
-    for (int i = 0; i < obs.no_of_philo; i++) {
-        philo[i].ref = &obs;
-        philo[i].last_eat = 0; //suppose to be the time it create philo
-        philo[i].philo_name = i + 1;
-        philo[i].fork_stat = pthread_mutex_init(&philo[i].fork, NULL);
-        if (philo[i].fork_stat != 0) {
-            philo_destroy(philo);
-            return (1);
+void*    referee(void *prog)
+{
+    t_env   *cast;
+    int     i;
+
+    cast = (t_env*)prog;
+    i = cast->thread_n;
+    if (cast->inputs.eat_limit > 0) {
+    /*We must run this for loop indefinite until death_flag == 1 or any philo reach eat_limit*/
+        while (cast->death_flag == 0 && (cast->philos[i].no_of_ate < cast->inputs.eat_limit || cast->inputs.eat_limit == -1))
+        {
+            if (diff_ms(cast->philos[i].last_eat) == cast->inputs.die_time) {
+                if (cast->death_flag == 1)
+                    break ;
+                printf("%lld %d died\n", diff_ms(cast->start_time), cast->philos[i].philo_id);
+                cast->death_flag = 1;
+            }
+            if (i + 1 == cast->inputs.no_of_philo)
+                i = 0;
+            else
+                i++;
         }
     }
-    for (int j = 0; j < obs.no_of_philo; j++) {
-        /*fill next pointer for each philo*/
-        if (j == obs.no_of_philo - 1)
-            philo[j].next = &philo[0];
-        else
-            philo[j].next = &philo[j + 1];
+    else 
+    {
+        while (cast->death_flag == 0)
+        {
+            for (int j = 0; j < cast->inputs.no_of_philo; j++)
+            {
+                if (diff_ms(cast->philos[j].last_eat) == cast->inputs.die_time) {
+                    if (cast->death_flag == 1)
+                        break ;
+                    printf("%lld %d died\n", diff_ms(cast->start_time), cast->philos[j].philo_id);
+                    cast->death_flag = 1;
+                }
+            }
+        }
     }
+    return (NULL);
 }
 
-void    philo_destroy(t_philo_param *philos)
+void*   philo(void *prog)
 {
-    for (int i = 0; i < philos->ref->no_of_philo; i++)
-        pthread_mutex_destroy(&philos[i].fork);
-}
+    //t_state status;
+    int     i;
+    t_env   *use;
 
-void*   philo(t_philo_param *philo)
-{
-    int     philo_hands[2]; //each philo have two hand to lock two forks and eat a meal
-    int     time_passed; //this check how long time had passed
-    t_philo_param   backup;
-
-    if (time_passed > backup.ref->die_time) {
-        printf("%d died\n", backup.philo_name);
-
+    use = (t_env*)prog;
+    i = use->thread_n;
+    //printf("i = %d\n", i);
+    while (use->death_flag == 0 && (use->philos[i].no_of_ate < use->inputs.eat_limit || use->inputs.eat_limit == -1))
+    {
+        if (use->death_flag == 1)
+            break ;
+        pthread_mutex_lock(&use->forks[use->philos[i].left_fork_index]);
+        if (use->death_flag == 1)
+            break ;
+        printf("%lld %d has taken a fork\n", diff_ms(use->start_time), use->philos[i].philo_id);
+        if (use->death_flag == 1)
+            break ;
+        pthread_mutex_lock(&use->forks[use->philos[i].right_fork_index]);
+        if (use->death_flag == 1)
+            break ;
+        printf("%lld %d has taken a fork\n", diff_ms(use->start_time), use->philos[i].philo_id);
+        if (use->death_flag == 1)
+            break ;
+        printf("%lld %d is eating\n", diff_ms(use->start_time), use->philos[i].philo_id);
+        if (use->death_flag == 1)
+            break ;
+        usleep((use->inputs.eat_time) * 1000);
+        pthread_mutex_unlock(&use->forks[use->philos[i].left_fork_index]);
+        pthread_mutex_unlock(&use->forks[use->philos[i].right_fork_index]);
+        use->philos[i].last_eat = get_ms();     
+        use->philos[i].no_of_ate++;
+        //status = sleeping;
+        if (use->death_flag == 1)
+            break ;
+        printf("%lld %d is sleeping\n", diff_ms(use->start_time), use->philos[i].philo_id);
+        if (use->death_flag == 1)
+            break ;
+        usleep((use->inputs.sleep_time) * 1000);
+        if (use->death_flag == 1)
+            break ;
+        printf("%lld %d is thinking\n", diff_ms(use->start_time), use->philos[i].philo_id);
+        if (use->death_flag == 1)
+            break ;
     }
-    backup = *philo;
-    philo_hands[0] = pthread_mutex_lock(&backup.fork);
-    philo_hands[1] = pthread_mutex_lock(&backup.next->fork);
-    if (philo_hands[0] != 0 || philo_hands[1] != 0)
-        printf("%d is thinking\n", backup.philo_name);
-    else {
-        printf("%d has taken a fork\n", backup.philo_name);
-        printf("%d is eating\n", backup.philo_name);
-    }
+    return (NULL);
 }
