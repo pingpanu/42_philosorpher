@@ -3,8 +3,10 @@ FLAGS = -Wall -Wextra -Werror
 CC = gcc
 
 SRCS = 	main.c \
+		input.c \
 		philo.c \
 		microsecond.c \
+		utils.c \
 
 OBJS = $(SRCS:.c=.o)
 

@@ -24,6 +24,8 @@ int main(int argc, char **argv)
         printf("You must type 4 or 5 arguments (exclude ./philo) \n");
         return (1);
     }
+    if (!valid_arguments(argc, argv, &prog))
+        return (1);
     prog.inputs = get_input(argc, argv);
     prog.death_flag = 0;
     /*make (no_of_philo) philos*/
@@ -53,9 +55,11 @@ int main(int argc, char **argv)
         printf("Failed to join refereee\n");
     }
     /*destroy all mutex to clean the program*/
-    if (prog.death_flag == 1) {
-        for (int i = 0; i < prog.inputs.no_of_philo; i++)
-            pthread_mutex_destroy(&prog.forks[i]);
+    for (int i = 0; i < prog.inputs.no_of_philo; i++) {
+        pthread_mutex_destroy(&prog.forks[i]);
     }
+    free(th);
+    free(prog.philos);
+    free(prog.forks);
     return (0);
 }

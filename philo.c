@@ -30,30 +30,23 @@ void*    referee(void *prog)
     /*We must run this for loop indefinite until death_flag == 1 or any philo reach eat_limit*/
         while (cast->death_flag == 0 && (cast->philos[i].no_of_ate < cast->inputs.eat_limit || cast->inputs.eat_limit == -1))
         {
-            if (diff_ms(cast->philos[i].last_eat) == cast->inputs.die_time) {
-                if (cast->death_flag == 1)
-                    break ;
-                printf("%lld %d died\n", diff_ms(cast->start_time), cast->philos[i].philo_id);
-                cast->death_flag = 1;
-            }
+            if (!check_philo_death(cast, &cast->philos[i]))
+                break ;
             if (i + 1 == cast->inputs.no_of_philo)
                 i = 0;
             else
                 i++;
         }
     }
+    /*in case optional args is not entered, it use this loop which run until any philo die*/
     else 
     {
         while (cast->death_flag == 0)
         {
             for (int j = 0; j < cast->inputs.no_of_philo; j++)
             {
-                if (diff_ms(cast->philos[j].last_eat) == cast->inputs.die_time) {
-                    if (cast->death_flag == 1)
-                        break ;
-                    printf("%lld %d died\n", diff_ms(cast->start_time), cast->philos[j].philo_id);
-                    cast->death_flag = 1;
-                }
+                if (!check_philo_death(cast, &cast->philos[i]))
+                    break ;
             }
         }
     }
@@ -62,48 +55,44 @@ void*    referee(void *prog)
 
 void*   philo(void *prog)
 {
-    //t_state status;
     int     i;
     t_env   *use;
 
     use = (t_env*)prog;
     i = use->thread_n;
-    //printf("i = %d\n", i);
     while (use->death_flag == 0 && (use->philos[i].no_of_ate < use->inputs.eat_limit || use->inputs.eat_limit == -1))
     {
+        /*I check if philo died, if yes this loop stop*/
         if (use->death_flag == 1)
             break ;
+        /*The philo grab two forks*/
+        use->philos[i].status = grab_fork;
         pthread_mutex_lock(&use->forks[use->philos[i].left_fork_index]);
-        if (use->death_flag == 1)
-            break ;
-        printf("%lld %d has taken a fork\n", diff_ms(use->start_time), use->philos[i].philo_id);
-        if (use->death_flag == 1)
+        if (!check_and_print(*use, use->philos[i]))
             break ;
         pthread_mutex_lock(&use->forks[use->philos[i].right_fork_index]);
-        if (use->death_flag == 1)
+        if (!check_and_print(*use, use->philos[i]))
             break ;
-        printf("%lld %d has taken a fork\n", diff_ms(use->start_time), use->philos[i].philo_id);
-        if (use->death_flag == 1)
-            break ;
-        printf("%lld %d is eating\n", diff_ms(use->start_time), use->philos[i].philo_id);
-        if (use->death_flag == 1)
+        /*The philo start eating*/
+        use->philos[i].status = eating;
+        if (!check_and_print(*use, use->philos[i]))
             break ;
         usleep((use->inputs.eat_time) * 1000);
+        /*The philo put two forks back to table*/
         pthread_mutex_unlock(&use->forks[use->philos[i].left_fork_index]);
         pthread_mutex_unlock(&use->forks[use->philos[i].right_fork_index]);
         use->philos[i].last_eat = get_ms();     
         use->philos[i].no_of_ate++;
-        //status = sleeping;
-        if (use->death_flag == 1)
+        if (use->philos[i].no_of_ate == use->inputs.eat_limit)
             break ;
-        printf("%lld %d is sleeping\n", diff_ms(use->start_time), use->philos[i].philo_id);
-        if (use->death_flag == 1)
+        /*The philo start sleeping*/
+        use->philos[i].status = sleeping;
+        if (!check_and_print(*use, use->philos[i]))
             break ;
         usleep((use->inputs.sleep_time) * 1000);
-        if (use->death_flag == 1)
-            break ;
-        printf("%lld %d is thinking\n", diff_ms(use->start_time), use->philos[i].philo_id);
-        if (use->death_flag == 1)
+        /*When philo wake up, it start thinking*/
+        use->philos[i].status = thinking;
+        if (!check_and_print(*use, use->philos[i]))
             break ;
     }
     return (NULL);
