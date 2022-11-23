@@ -2,7 +2,6 @@
 
 void   philo_init(t_env *prog)
 {
-    /*init forks*/
     for (int i = 0; i < prog->inputs.no_of_philo; i++)
     {
         prog->philos[i].philo_id = i + 1;

@@ -5,8 +5,8 @@ void   philo(t_env *prog)
     int     i;
 
     i = prog->thread_n;
-    prog->philos[i].philo_id = fork();
-    if (prog->philos[i].philo_id == 0)
+    prog->philos[i].philo_pid = fork();
+    if (prog->philos[i].philo_pid == 0)
     {
         /*pthread_create(&prog->philos[i].philodied, NULL, &death_check, &prog);
         pthread_join(prog->philos[i].philodied, NULL);*/

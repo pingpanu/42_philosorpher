@@ -20,6 +20,7 @@ int main(int argc, char **argv)
     if (!prog_sems_init(&prog))
         return (1);
     philo_init(&prog);
+    prog.start_time = get_ms();
     /*pthread_create(&prog.deathstop, NULL, &referee1, &prog);
     pthread_join(prog.deathstop, NULL);
     if (prog.inputs.eat_limit > 0) {
@@ -27,7 +28,6 @@ int main(int argc, char **argv)
         pthread_join(prog.limitstop, NULL);  
     }*/
     sem_wait(prog.sem_table);
-    prog.start_time = get_ms();
     for (int i = 0; i < prog.inputs.no_of_philo; i++)
     {
         prog.thread_n = i;
