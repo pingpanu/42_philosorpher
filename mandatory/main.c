@@ -26,10 +26,7 @@ int main(int argc, char **argv)
     }
     if (!valid_arguments(argc, argv, &prog))
         return (1);
-    prog.inputs = get_input(argc, argv);
-    prog.death_flag = 0;
     /*make (no_of_philo) philos*/
-    prog.philos = malloc(sizeof(t_philo_param) * prog.inputs.no_of_philo);
     philo_init(&prog);
     /*make (no_of_philo) philosorpher*/
     th = malloc(sizeof(pthread_t) * prog.inputs.no_of_philo);

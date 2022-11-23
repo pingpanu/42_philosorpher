@@ -62,5 +62,12 @@ int     valid_arguments(int argc, char **argv, t_env *prog)
         printf("Your sleep time should be at least 60\n");
         return (0);
     }
+    prog->death_flag = 0;
+    prog->philos = malloc(sizeof(t_philo_param) * prog->inputs.no_of_philo);
+    /*exit when fail to malloc*/
+    if (prog->philos == NULL) {
+        printf("Failed to malloc philos\n");
+        return (0);
+    }
     return (1);
 }
