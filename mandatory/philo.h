@@ -26,7 +26,10 @@ typedef struct s_input {
     int eat_limit; //optional arguments to stop program when any philo eat to this number
 }   t_input;
 
-/*struct for each philosorphers*/
+/*struct for each philosorphers
+in mandatory, threads is like splitted program
+that work independently, but shared information
+to each other*/
 typedef struct s_philo_param
 {
     t_state         status;

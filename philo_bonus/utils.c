@@ -4,7 +4,7 @@ throughout the function.*/
 
 #include "philo.h"
 
-/*this function check if death_flag == 1, if yes return 0, if not return 1*/
+/*this function check if death_flag == 1, if yes return 0, if not return 1
 int    check_and_print(t_env prog, t_philo_param curr_philo)
 {
     if (prog.death_flag == 1)
@@ -22,14 +22,14 @@ int    check_and_print(t_env prog, t_philo_param curr_philo)
     if (prog.death_flag == 1)
         return (0);
     return (1);
-}
+}*/
 
 /*this function is actually boolean function that check if any philo die
-if yes, return 0 so the loop in referee stop*/
+if yes, return 0 so the loop in referee stop
 int     check_philo_death(t_env *prog, t_philo_param *curr_philo)
 {   
-    /*check if env death_flag = 1 (other philo died)
-    if it is we stop whole process*/ 
+    check if env death_flag = 1 (other philo died)
+    if it is we stop whole process
     if (prog->death_flag == 1)
         return (0);
     if (diff_ms(curr_philo->last_eat) == prog->inputs.die_time) 
@@ -40,25 +40,26 @@ int     check_philo_death(t_env *prog, t_philo_param *curr_philo)
         prog->death_flag = 1;
     }
     return (1);    
-}
+}*/
 
-void*   death_check(void *prog)
+void*   monitor(void *prog)
 {
     t_env   *rec;
     int     i;
 
     rec = (t_env*)prog;
     i = rec->thread_n;
-    sem_wait(rec->sem_dead);
-    if (diff_ms(rec->philos[i].last_eat) == rec->inputs.die_time) {
-        rec->death_flag = 0;
-        rec->philos[i].status = die;
-        //sem_wait(rec->sem_write);
-        printf("%lld %d died\n", diff_ms(rec->start_time), rec->philos[i].philo_id);
-        //sem_post(rec->sem_write);
-        sem_post(rec->sem_table);
+    while (1)
+    {
+        //sem_wait(rec->sem_dead);
+        if (diff_ms(rec->philos[i].last_eat) == rec->inputs.die_time) {
+            //rec->death_flag = 1;
+            rec->philos[i].status = die;
+            printf("%lld %d died\n", diff_ms(rec->start_time), rec->philos[i].philo_id);
+            //sem_post(rec->sem_dead);
+            exit(1);
+        }
     }
-    sem_post(rec->sem_dead);
     return (NULL);
 }
 
