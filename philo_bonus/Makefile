@@ -8,7 +8,6 @@ SRCS = 	main.c \
 		microsecond.c \
 		utils.c \
 		prog_init.c \
-#		referees.c \
 
 OBJS = $(SRCS:.c=.o)
 

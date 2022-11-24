@@ -53,14 +53,14 @@ are child processes*/
 typedef struct  s_env
 {
     sem_t           *sem_forks; //number of forks on table
-    //sem_t           *sem_write; check printf
+    //sem_t           *sem_write; //check printf
     sem_t           *sem_dead; //check if philo died
-    //sem_t           *sem_table; master semaphore to stop process
+    sem_t           *sem_table; //master semaphore to stop process
     t_input         inputs;
     t_philo_param   *philos;
     pthread_t       deathstop;
     pthread_t       limitstop;
-    //int             death_flag;
+    int             death_flag;
     //int             eat_end;
     int             thread_n;
     long long       start_time;
@@ -73,18 +73,10 @@ int     prog_sems_init(t_env *prog);
 void        philo_init(t_env *prog);
 /*in philo.c, to execute processes*/
 void        philo(t_env *prog);
-/*philo_bonus have two checkers (referees)
-1 to check death
-2 to check eat_limit*/
-//void*       referee1(void *prog);
-void*       referee2(void *prog);
 /*in microsecond.c, to get time in millisecond*/
 long long   get_ms(void);
 long long   diff_ms(long long time);
 /*in utils.c, to check and kill process in philo.c*/
-//int         check_and_print(t_env prog, t_philo_param curr_philo);
-int         check_philo_death(t_env *prog, t_philo_param *curr_philo);
 void*   monitor(void *prog);
-/*debugging functions*/
-//void    print_sem_value(sem_t *thesem, char *str);
+void    kill_all_philos(t_env *prog, int no_of_philo);
 #endif
