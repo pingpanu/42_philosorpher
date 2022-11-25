@@ -15,9 +15,9 @@ void*   monitor(void *prog)
     {
         sem_wait(rec->sem_dead);
         if (diff_ms(rec->philos[i].last_eat) == rec->inputs.die_time) {
-            rec->death_flag = 1;
             rec->philos[i].status = die;
             printf("%lld %d died\n", diff_ms(rec->start_time), rec->philos[i].philo_id);
+            rec->death_flag = 1;
             exit(1);
         }
         sem_post(rec->sem_dead);

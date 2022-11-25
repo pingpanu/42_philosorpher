@@ -39,6 +39,7 @@ void philo(t_env *prog)
 
     i = prog->thread_n;
     pthread_create(&(prog->philos[i].monitor), NULL, monitor, prog);
+    pthread_join(prog->deathstop, NULL);
     while (1)
     {
         philo_grabforks(prog, i);

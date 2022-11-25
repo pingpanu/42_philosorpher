@@ -29,11 +29,13 @@ int main(int argc, char **argv)
         immediatly stop the program*/
         if (prog.inputs.no_of_philo == 0)
                 clean_exit(&prog, 0);
+        waitpid(0, &status, 0);
         /*this is parent process to check all child processes (philos)
         if death detected, kill all child processes, if an philo reach eat
         limits, kill the philo and decrement no_of_philo*/
+        if (WEXITSTATUS(status) == 1)
+            clean_exit(&prog, prog.inputs.no_of_philo);
         for (int j = 0 ; j < prog.inputs.no_of_philo; j++) {
-            
             waitpid(prog.philos[j].philo_pid, &status, 0);
             if (WEXITSTATUS(status) == 1)
                 clean_exit(&prog, prog.inputs.no_of_philo);
