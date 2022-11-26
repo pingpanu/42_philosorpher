@@ -46,12 +46,16 @@ int     valid_arguments(int argc, char **argv, t_env *prog)
         }
     }
     prog->inputs = get_input(argc, argv);
+    /*in case no_of_philo is 1, the philo can't grab two forks and can't eat, so it died
+    so I just printf the message then return 0 to end the program immediatly*/
     if (prog->inputs.no_of_philo == 1) {
         printf("%d %d has taken a fork\n", 0, 1);
         usleep(prog->inputs.die_time * 1000);
         printf("%d %d died\n", prog->inputs.die_time, 1);
         return (0);
     }
+    /*on remote computing (Guacamole) you should limit this figure to 100 only although
+    the evaluation suggest 200*/
     if (prog->inputs.no_of_philo == 0 || prog->inputs.no_of_philo > 200) {
         printf("Your number of philosopher should be between 1 to 200 \n");
         return (0);
@@ -68,6 +72,7 @@ int     valid_arguments(int argc, char **argv, t_env *prog)
         printf("Your sleep time should be at least 60\n");
         return (0);
     }
+    /*death flag always equal
     prog->death_flag = 0;
     prog->philos = malloc(sizeof(t_philo_param) * prog->inputs.no_of_philo);
     /*exit when fail to malloc*/
