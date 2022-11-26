@@ -46,6 +46,12 @@ int     valid_arguments(int argc, char **argv, t_env *prog)
         }
     }
     prog->inputs = get_input(argc, argv);
+    if (prog->inputs.no_of_philo == 1) {
+        printf("%d %d has taken a fork\n", 0, 1);
+        usleep(prog->inputs.die_time * 1000);
+        printf("%d %d died\n", prog->inputs.die_time, 1);
+        return (0);
+    }
     if (prog->inputs.no_of_philo == 0 || prog->inputs.no_of_philo > 200) {
         printf("Your number of philosopher should be between 1 to 200 \n");
         return (0);
