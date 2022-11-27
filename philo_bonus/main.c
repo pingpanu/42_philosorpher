@@ -37,8 +37,6 @@ int main(int argc, char **argv)
             clean_exit(&prog, prog.inputs.no_of_philo);
         for (int j = 0 ; j < prog.inputs.no_of_philo; j++) {
             waitpid(prog.philos[j].philo_pid, &status, 0);
-            if (WEXITSTATUS(status) == 1)
-                clean_exit(&prog, prog.inputs.no_of_philo);
             if (WEXITSTATUS(status) == 0) {
                 kill(prog.philos[j].philo_pid, SIGKILL);
                 prog.inputs.no_of_philo--;
